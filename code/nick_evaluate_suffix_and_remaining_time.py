@@ -234,7 +234,7 @@ print("Loaded model from disk")
 #model = load_model('output_files/models/200_model_59-1.50.h5')
 
 # define helper functions
-def encode(sentence, times, times3, attributes,maxlen=maxlen):
+def encode(sentence, times, times3, sentences_attributes,maxlen=maxlen):
     num_features = len(chars)+5+len(attributes)
     X = np.zeros((1, maxlen, num_features), dtype=np.float32)
     leftpad = maxlen-len(sentence)
@@ -251,7 +251,7 @@ def encode(sentence, times, times3, attributes,maxlen=maxlen):
         X[0, t+leftpad, len(chars)+2] = times2[t]/divisor2
         X[0, t+leftpad, len(chars)+3] = timesincemidnight.seconds/86400
         X[0, t+leftpad, len(chars)+4] = times3[t].weekday()/7
-        for i in xrange(len(attributes)):
+        for i in xrange(len(sentences_attributes)):
             #print(sentences_attributes[i][t][0])
             #nick check the zero, it is there because it was a list
             X[i, t + leftpad, len(chars) + 5+i]=sentences_attributes[i][t][0]
@@ -285,11 +285,12 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
     #considering also size 1 prefixes
     for prefix_size in range(1,maxlen):
         print(prefix_size)
-        for line, times, times2, times3 in izip(lines, lines_t, lines_t2, lines_t3):
+        for line, times, times2, times3 in izip(lines, lines_t, lines_t2, lines_t3,attributes):
             times.append(0)
             cropped_line = ''.join(line[:prefix_size])
             cropped_times = times[:prefix_size]
             cropped_times3 = times3[:prefix_size]
+            cropped_attributes= attributes[:prefix_size]
             if len(times2)<prefix_size:
                 continue # make no prediction for this case, since this case has ended already
             ground_truth = ''.join(line[prefix_size:prefix_size+predict_size])
@@ -299,7 +300,7 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
             predicted = ''
             total_predicted_time = 0
             for i in range(predict_size):
-                enc = encode(cropped_line, cropped_times, cropped_times3)
+                enc = encode(cropped_line, cropped_times, cropped_times3,cropped_attributes)
                 y = model.predict(enc, verbose=0) # make predictions
                 # split predictions into seperate activity and time predictions
                 y_char = y[0][0] 
