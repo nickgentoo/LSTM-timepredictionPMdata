@@ -235,7 +235,7 @@ print("Loaded model from disk")
 
 # define helper functions
 def encode(sentence, times, times3, sentences_attributes,maxlen=maxlen):
-    num_features = len(chars)+5+len(attributes)
+    num_features = len(chars)+5+len(sentences_attributes)
     X = np.zeros((1, maxlen, num_features), dtype=np.float32)
     leftpad = maxlen-len(sentence)
     times2 = np.cumsum(times)
@@ -254,7 +254,7 @@ def encode(sentence, times, times3, sentences_attributes,maxlen=maxlen):
         for i in xrange(len(sentences_attributes)):
             #print(sentences_attributes[i][t][0])
             #nick check the zero, it is there because it was a list
-            X[i, t + leftpad, len(chars) + 5+i]=sentences_attributes[i][t]
+            X[0, t + leftpad, len(chars) + 5+i]=sentences_attributes[i][t]
     return X
 
 def getSymbol(predictions):
@@ -291,6 +291,7 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
             cropped_times = times[:prefix_size]
             cropped_times3 = times3[:prefix_size]
             cropped_attributes= [a[:prefix_size] for a in attributes]
+            print cropped_attributes
 
             if len(times2)<prefix_size:
                 continue # make no prediction for this case, since this case has ended already
