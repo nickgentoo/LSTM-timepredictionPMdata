@@ -285,12 +285,12 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
     #considering also size 1 prefixes
     for prefix_size in range(1,maxlen):
         print(prefix_size)
-        for line, times, times2, times3 in izip(lines, lines_t, lines_t2, lines_t3,attributes):
+        for line, times, times2, times3 in izip(lines, lines_t, lines_t2, lines_t3):
             times.append(0)
             cropped_line = ''.join(line[:prefix_size])
             cropped_times = times[:prefix_size]
             cropped_times3 = times3[:prefix_size]
-            cropped_attributes= attributes[:prefix_size]
+            cropped_attributes= attributes[:][:prefix_size]
             if len(times2)<prefix_size:
                 continue # make no prediction for this case, since this case has ended already
             ground_truth = ''.join(line[prefix_size:prefix_size+predict_size])
