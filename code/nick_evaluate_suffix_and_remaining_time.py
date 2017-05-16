@@ -254,7 +254,7 @@ def encode(sentence, times, times3, sentences_attributes,maxlen=maxlen):
         for i in xrange(len(sentences_attributes)):
             #print(sentences_attributes[i][t][0])
             #nick check the zero, it is there because it was a list
-            X[i, t + leftpad, len(chars) + 5+i]=sentences_attributes[i][t][0]
+            X[i, t + leftpad, len(chars) + 5+i]=sentences_attributes[i][t]
     return X
 
 def getSymbol(predictions):
