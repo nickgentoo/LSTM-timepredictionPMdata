@@ -290,7 +290,8 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
             cropped_line = ''.join(line[:prefix_size])
             cropped_times = times[:prefix_size]
             cropped_times3 = times3[:prefix_size]
-            cropped_attributes= attributes[:][:prefix_size]
+            cropped_attributes= [a[:prefix_size] for a in attributes]
+
             if len(times2)<prefix_size:
                 continue # make no prediction for this case, since this case has ended already
             ground_truth = ''.join(line[prefix_size:prefix_size+predict_size])
