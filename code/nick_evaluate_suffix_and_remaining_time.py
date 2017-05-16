@@ -38,19 +38,37 @@ timeseqs = []
 timeseqs2 = []
 times = []
 times2 = []
+#nick
+attributes=[]
+attributes_dict=[]
+attributes_sizes=[]
+
 numlines = 0
 casestarttime = None
 lasteventtime = None
 for row in spamreader:
+    #print(row)
     t = time.strptime(row[2], "%Y-%m-%d %H:%M:%S")
+    #test different format
+    #t = 0#time.strptime(row[2], "%Y/%m/%d %H:%M:%S")
+
     if row[0]!=lastcase:
         casestarttime = t
         lasteventtime = t
         lastcase = row[0]
-        if not firstLine:        
+        if not firstLine:
             lines.append(line)
             timeseqs.append(times)
             timeseqs2.append(times2)
+            for i in xrange(len(attributes)):
+                attributes[i].append(attributesvalues[i])
+        else:
+            #if firstline. I have to add te elements to attributes
+            for a in row[3:]:
+                attributes.append([])
+                attributes_dict.append({})
+                attributes_sizes.append(0)
+        #print(attributes)
         line = ''
         times = []
         times2 = []
@@ -64,12 +82,27 @@ for row in spamreader:
     times2.append(timediff2)
     lasteventtime = t
     firstLine = False
+    attributesvalues=[]
+    indexnick=0
+    for a in row[3:]:
+        #todo cast a intero se e intero if
+        if a in attributes_dict[indexnick]:
+            attributesvalues.append(attributes_dict[indexnick][a])
+        else:
+            attributes_dict[indexnick][a]=attributes_sizes[indexnick]
+            attributes_sizes[indexnick]+=1
+            attributesvalues.append(attributes_dict[indexnick][a])
+
+        indexnick+=1
 
 # add last case
 lines.append(line)
 timeseqs.append(times)
 timeseqs2.append(times2)
+for i in xrange(len(attributes)):
+    attributes[i].append(attributesvalues[i])
 numlines+=1
+
 
 divisor = np.mean([item for sublist in timeseqs for item in sublist])
 print('divisor: {}'.format(divisor))
@@ -82,10 +115,20 @@ elems_per_fold = int(round(numlines/3))
 fold1 = lines[:elems_per_fold]
 fold1_t = timeseqs[:elems_per_fold]
 fold1_t2 = timeseqs2[:elems_per_fold]
+#nick
+fold1_a=[a[:elems_per_fold] for a in attributes]
 
 fold2 = lines[elems_per_fold:2*elems_per_fold]
 fold2_t = timeseqs[elems_per_fold:2*elems_per_fold]
 fold2_t2 = timeseqs2[elems_per_fold:2*elems_per_fold]
+#nick
+fold2_a=[a[elems_per_fold:2*elems_per_fold] for a in attributes]
+
+fold3 = lines[2*elems_per_fold:]
+fold3_t = timeseqs[2*elems_per_fold:]
+fold3_t2 = timeseqs2[2*elems_per_fold:]
+#nick
+fold3_a=[a[2*elems_per_fold:] for a in attributes]
 
 lines = fold1 + fold2
 lines_t = fold1_t + fold2_t
@@ -191,8 +234,8 @@ print("Loaded model from disk")
 #model = load_model('output_files/models/200_model_59-1.50.h5')
 
 # define helper functions
-def encode(sentence, times, times3, maxlen=maxlen):
-    num_features = len(chars)+5
+def encode(sentence, times, times3, attributes,maxlen=maxlen):
+    num_features = len(chars)+5+len(attributes)
     X = np.zeros((1, maxlen, num_features), dtype=np.float32)
     leftpad = maxlen-len(sentence)
     times2 = np.cumsum(times)
@@ -208,6 +251,10 @@ def encode(sentence, times, times3, maxlen=maxlen):
         X[0, t+leftpad, len(chars)+2] = times2[t]/divisor2
         X[0, t+leftpad, len(chars)+3] = timesincemidnight.seconds/86400
         X[0, t+leftpad, len(chars)+4] = times3[t].weekday()/7
+        for i in xrange(len(attributes)):
+            #print(sentences_attributes[i][t][0])
+            #nick check the zero, it is there because it was a list
+            X[i, t + leftpad, len(chars) + 5+i]=sentences_attributes[i][t][0]
     return X
 
 def getSymbol(predictions):
