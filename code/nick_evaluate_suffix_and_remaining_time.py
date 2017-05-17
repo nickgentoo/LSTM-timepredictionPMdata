@@ -330,6 +330,9 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
                 cropped_times3.append(cropped_times3[-1] + timedelta(seconds=y_t))
                 total_predicted_time = total_predicted_time + y_t
                 predicted += prediction
+                for a in xrange(len(attributes)):
+                    # print(attributes[a][0:i])
+                    cropped_attributes[a].extend(0)
             output = []
             if len(ground_truth)>0:
                 output.append(prefix_size)
