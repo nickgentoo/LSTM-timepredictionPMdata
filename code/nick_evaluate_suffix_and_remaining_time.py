@@ -254,7 +254,7 @@ def encode(sentence, times, times3, sentences_attributes,maxlen=maxlen):
         for i in xrange(len(sentences_attributes)):
             #print(sentences_attributes[i][t][0])
             #nick check the zero, it is there because it was a list
-            X[0, t + leftpad, len(chars) + 5+i]=sentences_attributes[i][t][0]
+            X[0, t + leftpad, len(chars) + 5+i]=sentences_attributes[i][t]
     return X
 
 def getSymbol(predictions):
@@ -293,7 +293,7 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
             cropped_times3 = times3[:prefix_size]
             for a in xrange(len(attributes)):
                 # print(attributes[a][0:i])
-                cropped_attributes[a].append(attributes[a][0:prefix_size])
+                cropped_attributes[a].extend(attributes[a][0:prefix_size])
 
             #cropped_attributes= [a[:prefix_size] for a in attributes]
             #print cropped_attributes
