@@ -332,7 +332,7 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
                 predicted += prediction
                 for a in xrange(len(attributes)):
                     # print(attributes[a][0:i])
-                    cropped_attributes[a].extend(0)
+                    cropped_attributes[a].append(0)
             output = []
             if len(ground_truth)>0:
                 output.append(prefix_size)
