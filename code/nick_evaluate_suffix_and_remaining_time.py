@@ -313,6 +313,7 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
                 enc = encode(cropped_line, cropped_times, cropped_times3,cropped_attributes)
                 y = model.predict(enc, verbose=0) # make predictions
                 # split predictions into seperate activity and time predictions
+                print y
                 y_char = y[0][0] 
                 y_t = y[1][0][0]
                 prediction = getSymbol(y_char) # undo one-hot encoding           
