@@ -293,7 +293,7 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
             cropped_times3 = times3[:prefix_size]
             for a in xrange(len(attributes)):
                 # print(attributes[a][0:i])
-                cropped_attributes[a].append(attributes[a][0:i])
+                cropped_attributes[a].append(attributes[a][0:prefix_size])
 
             #cropped_attributes= [a[:prefix_size] for a in attributes]
             #print cropped_attributes
