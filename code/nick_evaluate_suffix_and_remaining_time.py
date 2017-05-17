@@ -239,6 +239,7 @@ def encode(sentence, times, times3, sentences_attributes,maxlen=maxlen):
     X = np.zeros((1, maxlen, num_features), dtype=np.float32)
     leftpad = maxlen-len(sentence)
     times2 = np.cumsum(times)
+    print "sentence",len(sentence)
     for t, char in enumerate(sentence):
         midnight = times3[t].replace(hour=0, minute=0, second=0, microsecond=0)
         timesincemidnight = times3[t]-midnight
