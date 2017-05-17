@@ -296,7 +296,7 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
                 cropped_attributes[a].extend(attributes[a][0:prefix_size])
 
             #cropped_attributes= [a[:prefix_size] for a in attributes]
-            #print cropped_attributes
+            print cropped_attributes
 
             if len(times2)<prefix_size:
                 continue # make no prediction for this case, since this case has ended already
