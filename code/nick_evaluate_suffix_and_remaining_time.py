@@ -61,7 +61,7 @@ for row in spamreader:
             timeseqs.append(times)
             timeseqs2.append(times2)
             for i in xrange(len(attributes)):
-                attributes[i].append(attributesvalues[i])
+                attributes[i].extend(attributesvalues[i])
         else:
             #if firstline. I have to add te elements to attributes
             for a in row[3:]:
@@ -100,7 +100,7 @@ lines.append(line)
 timeseqs.append(times)
 timeseqs2.append(times2)
 for i in xrange(len(attributes)):
-    attributes[i].append(attributesvalues[i])
+    attributes[i].extend(attributesvalues[i])
 numlines+=1
 
 
@@ -290,6 +290,7 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
             times.append(0)
             cropped_line = ''.join(line[:prefix_size])
             cropped_times = times[:prefix_size]
+            print "times_len",len(cropped_times)
             cropped_times3 = times3[:prefix_size]
             cropped_attributes = [[] for i in xrange(len(attributes))]
             for a in xrange(len(attributes)):
