@@ -277,7 +277,6 @@ two_ahead_pred = []
 three_ahead_gt = []
 three_ahead_pred = []
 
-cropped_attributes=[[] for i in xrange(len(attributes))]
 
 # make predictions
 with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % eventlog, 'wb') as csvfile:
@@ -285,18 +284,19 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
     spamwriter.writerow(["Prefix length", "Groud truth", "Predicted", "Levenshtein", "Damerau", "Jaccard", "Ground truth times", "Predicted times", "RMSE", "MAE", "Median AE"])
     #considering also size 1 prefixes
     for prefix_size in range(1,maxlen):
-        print(prefix_size)
+        #print(prefix_size)
         for line, times, times2, times3 in izip(lines, lines_t, lines_t2, lines_t3):
             times.append(0)
             cropped_line = ''.join(line[:prefix_size])
             cropped_times = times[:prefix_size]
             cropped_times3 = times3[:prefix_size]
+            cropped_attributes = [[] for i in xrange(len(attributes))]
             for a in xrange(len(attributes)):
                 # print(attributes[a][0:i])
                 cropped_attributes[a].extend(attributes[a][0:prefix_size])
 
             #cropped_attributes= [a[:prefix_size] for a in attributes]
-            print cropped_attributes
+            #print cropped_attributes
 
             if len(times2)<prefix_size:
                 continue # make no prediction for this case, since this case has ended already
