@@ -252,7 +252,8 @@ def encode(sentence, times, times3, sentences_attributes,maxlen=maxlen):
         X[0, t+leftpad, len(chars)+3] = timesincemidnight.seconds/86400
         X[0, t+leftpad, len(chars)+4] = times3[t].weekday()/7
         for i in xrange(len(sentences_attributes)):
-            print(str(i)+" "+str(t)+" "+sentences_attributes[i][t])
+            print(str(i)+" "+str(t))
+            print(sentences_attributes[i][t])
             #nick check the zero, it is there because it was a list
             X[0, t + leftpad, len(chars) + 5+i]=sentences_attributes[i][t]
     return X
