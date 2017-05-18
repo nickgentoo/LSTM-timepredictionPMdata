@@ -240,7 +240,6 @@ def encode(sentence, times, times3, sentences_attributes, y_t_seq,maxlen=maxlen)
             print(sentences_attributes[i][t])
             #nick check the zero, it is there because it was a list
             X[0, t + leftpad, len(chars) + 5+i]=sentences_attributes[i][t]
-    y_t[i] = y_t_seq[i][-1]/divisor
     return X,y
 
 def getSymbol(predictions):
@@ -287,8 +286,7 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
             #cropped_attributes= [a[:prefix_size] for a in attributes]
             #print cropped_attributes
 
-            if len(times2)<prefix_size:
-                continue # make no prediction for this case, since this case has ended already
+            
             ground_truth = ''.join(line[prefix_size:prefix_size+predict_size])
             ground_truth_t = times2[prefix_size-1]
             case_end_time = times2[len(times2)-1]
