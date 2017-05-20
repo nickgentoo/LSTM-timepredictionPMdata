@@ -170,6 +170,7 @@ print(indices_char)
 
 
 elems_per_fold = int(round(numlines/3))
+
 fold1 = lines[:elems_per_fold]
 fold1_t = timeseqs[:elems_per_fold]
 fold1_t2 = timeseqs2[:elems_per_fold]
@@ -231,7 +232,9 @@ for line, line_t, line_t2, line_t3, line_t4 in izip(lines, lines_t, lines_t2, li
         for a in xrange(len(attributes)):
             #print(attributes[a][0:i])
             sentences_attributes[a].append(attributes[a][0:i])
-
+y_times_train=fold2 = y_times[0:2*elems_per_fold]
+divisory = np.mean([item for sublist in y_t_seq for item in sublist])
+print('divisory: {}'.format(divisory))
 print('nb sequences:', len(sentences))
 #print(len(sentences))
 print('Vectorization...')
