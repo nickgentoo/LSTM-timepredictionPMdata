@@ -306,6 +306,7 @@ for line, line_t, line_t2, line_t3, line_t4 in izip(lines, lines_t, lines_t2, li
 print('nb sequences:', len(sentences))
 #print(len(sentences))
 print('Vectorization...')
+#modificato nick
 num_features = len(chars)+5+len(attributes)
 print('num features: {}'.format(num_features))
 X = np.zeros((len(sentences), maxlen, num_features), dtype=np.float32)
