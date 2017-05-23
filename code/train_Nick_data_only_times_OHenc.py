@@ -186,7 +186,7 @@ for attr_idx in xrange(len(attributes)):
         #print(a)
         #attributes_ohencoders.append(OneHotEncoder(attributes_sizes[attr_idx]+1,sparse=False))
         #print (attributes_ohencoders[attr_idx])
-        A=a.todense()
+        #A=a.todense()
         attributes_encoded.append( a)
         #print(attributes_encoded[attr_idx])
 
