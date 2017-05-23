@@ -78,6 +78,7 @@ for row in spamreader:
         lasteventtime = t
         lastcase = row[0]
         if not firstLine:
+            #print (line)
             lines.append(line)
             timeseqs.append(times)
             timeseqs2.append(times2)
@@ -86,6 +87,7 @@ for row in spamreader:
             timeseqs3.append(times3)
             timeseqs4.append(times4)
             for i in xrange(len(attributes)):
+                print(attributesvalues[i])
                 attributes[i].append(attributesvalues[i])
         else:
             #if firstline. I have to add te elements to attributes
@@ -100,6 +102,7 @@ for row in spamreader:
         times2 = []
         times3 = []
         times4 = []
+        attributesvalues = [ ]
 
         numlines+=1
     n_events_in_trace+=1
@@ -118,16 +121,17 @@ for row in spamreader:
     times4.append(timediff4)
     lasteventtime = t
     firstLine = False
-    attributesvalues=[]
     indexnick=0
     for a in row[3:]:
+        if len(attributesvalues)<=indexnick:
+            attributesvalues.append([])
         a=a.strip('"')
         #todo cast a intero se e intero if
         if a!="":
             try:
 
                 attr=float(a)
-                attributesvalues.append(attr)
+                attributesvalues[indexnick].append(attr)
                 #print("float attr")
                 #print(a)
 
@@ -136,9 +140,9 @@ for row in spamreader:
                          attributes_dict[indexnick][a]=attributes_sizes[indexnick]+1
                          attributes_sizes[indexnick]=attributes_sizes[indexnick]+1
 
-                attributesvalues.append(attributes_dict[indexnick][a])
+                attributesvalues[indexnick].append(attributes_dict[indexnick][a])
         else:
-            attributesvalues.append(-1)
+            attributesvalues[indexnick].append(-1)
         # if a in attributes_dict[indexnick]:
         #     attributesvalues.append(attributes_dict[indexnick][a])
         # else:
@@ -169,32 +173,6 @@ print('divisor2: {}'.format(divisor2))
 attributes_ohencoders=[]
 attributes_encoded=[]
 
-from sklearn.preprocessing import OneHotEncoder
-for attr_idx in xrange(len(attributes)):
-    #print(attributes_sizes)
-    if attributes_sizes[attr_idx]>0:
-        #print(attributes[attr_idx])
-        #print(attributes_sizes[attr_idx])
-        #print(attributes[attr_idx])
-        #transform vector of feature indices to sparse matrix
-        from scipy.sparse import csr_matrix, lil_matrix
-        a=csr_matrix((len(attributes[attr_idx]),attributes_sizes[attr_idx]+1) )
-        for idx in xrange(len(attributes[attr_idx])):
-            #print(attributes[attr_idx])
-            #print(attributes_sizes[attr_idx]+1,attributes[attr_idx][idx])
-            a[idx,attributes[attr_idx][idx]]=1
-        #print(a)
-        #attributes_ohencoders.append(OneHotEncoder(attributes_sizes[attr_idx]+1,sparse=False))
-        #print (attributes_ohencoders[attr_idx])
-        #A=a.todense()
-        attributes_encoded.append( a)
-        #print(attributes_encoded[attr_idx])
-
-    else:
-        #attributes_ohencoders.append(0)
-        attributes_encoded.append(attributes[attr_idx])
-        #print("numeric attribute")
-        #assert(attributes[attr_idx]==attributes_encoded[attr_idx])
 
 step = 1
 sentences = []
@@ -266,8 +244,13 @@ sentences_t2 = []
 sentences_t3 = []
 sentences_t4 = []
 sentences_attributes=[[] for i in xrange(len(attributes))]
+sentences_attributes_size=[[] for i in xrange(len(attributes))]
+
 y_t_seq=[]
-for line, line_t, line_t2, line_t3, line_t4 in izip(lines, lines_t, lines_t2, lines_t3, lines_t4):
+#print(len(lines), len(y_times), len(attributes_encoded[0]))
+index_y=0
+index_example=0
+for ex, (line, line_t, line_t2, line_t3, line_t4) in enumerate(izip(lines, lines_t, lines_t2, lines_t3, lines_t4)):
     for i in range(0, len(line), step):
         if i==0:
             continue
@@ -276,10 +259,13 @@ for line, line_t, line_t2, line_t3, line_t4 in izip(lines, lines_t, lines_t2, li
         sentences_t2.append(line_t2[0:i])
         sentences_t3.append(line_t3[0:i])
         sentences_t4.append(line_t4[0:i])
-        y_t_seq.append(y_times[0:i])
-        for a in xrange(len(attributes)):
-            #print(attributes[a][0:i])
-            sentences_attributes[a].append(attributes[a][0:i])
+        for j in xrange(len(attributes)):
+            sentences_attributes[j].append(attributes[j][ex][0:i])
+
+        y_t_seq.append(y_times[index_y:index_y+i])
+    index_y+=len(line)
+    index_example+=1
+
 y_times_train=fold2 = y_times[0:2*elems_per_fold]
 divisory = np.mean([item for sublist in y_t_seq for item in sublist])
 print('divisory: {}'.format(divisory))
@@ -289,7 +275,9 @@ print('Vectorization...')
 #modificato nick
 num_features = len(chars)+5
 for idx in xrange(len(attributes)):
-    num_features+=attributes_sizes[idx]+1
+    #num_features+=attributes_sizes[idx]+1
+    num_features +=  1
+
 #attr_len= len(attributes)
 print('num features: {}'.format(num_features))
 X = np.zeros((len(sentences), maxlen, num_features), dtype=np.float32)
@@ -316,30 +304,7 @@ for i, sentence in enumerate(sentences):
         index=0
 
         for j in xrange(len(attributes)):
-            if (attributes_sizes[j]>0):
-                #print(type(attributes_encoded[j]))
-                row, cols = attributes_encoded[j].nonzero()
-                #print(vector)
-                #print(len(np.unique(cols)),attributes_sizes[j]+1)
-
-                #print (attributes_encoded[j].shape)
-                #print(attributes_sizes[j])
-                #print(str(row)+" "+str(cols))
-                first=True
-                for r,c in zip(row, cols):
-                    if r==i:
-                        if not first:
-                            print("No one hot!")
-                        X[i, t + leftpad, len(chars) + 5 + index + c] = 1
-                        first=False
-                        #print(t + leftpad, len(chars) + 5 + index + c)
-                index += attributes_sizes[j]+1
-
-            else:#print(sentences_attributes[i][t][0])
-                #print("else")
-            #nick check the zero, it is there because it was a list
-                #print (attributes_encoded[j][i])
-                X[i, t + leftpad, len(chars) + 5+index+0]=attributes_encoded[j][i]
+                X[i, t + leftpad, len(chars) + 5+index]=sentences_attributes[j][i][t]
                 index += 1
 
             #print(y_t_seq[i])
