@@ -281,8 +281,8 @@ print('Vectorization...')
 #modificato nick
 num_features = len(chars)+5
 for idx in xrange(len(attributes)):
-    #num_features+=attributes_sizes[idx]+1
-    num_features +=  1
+    num_features+=attributes_sizes[idx]+1
+    #num_features +=  1
 
 #attr_len= len(attributes)
 print('num features: {}'.format(num_features))
@@ -308,12 +308,20 @@ for i, sentence in enumerate(sentences):
         X[i, t+leftpad, len(chars)+2] = sentence_t2[t]/divisor2
         X[i, t+leftpad, len(chars)+3] = sentence_t3[t]/86400
         X[i, t+leftpad, len(chars)+4] = sentence_t4[t]/7
+        startoh=0
         for j in xrange(len(attributes)):
-                X[i, t + leftpad, len(chars) + 5+j]=sentences_attributes[j][i][t]
+                #X[i, t + leftpad, len(chars) + 5+j]=sentences_attributes[j][i][t]
+                if attributes_sizes[j]>0:
+                    X[i, t + leftpad, len(chars) + 5+startoh+sentences_attributes[j][i][t]]=1
+                else:
+                    X[i, t + leftpad, len(chars) + 5+startoh]=sentences_attributes[j][i][t]
 
-            #print(y_t_seq[i])
+                startoh+=(attributes_sizes[j]+1)
+
+
+    #print(y_t_seq[i])
     y_t[i] = y_t_seq[i][-1]/divisor
-    print (i,(y_t[i]*divisor)/(3600*24))
+    #print (i,(y_t[i]*divisor)/(3600*24))
 
     np.set_printoptions(threshold=np.nan)
 
