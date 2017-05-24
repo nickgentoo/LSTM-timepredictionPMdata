@@ -93,7 +93,7 @@ for row in spamreader:
             timeseqs3.append(times3)
             timeseqs4.append(times4)
             for i in xrange(len(attributes)):
-                print(attributesvalues[i])
+                #print(attributesvalues[i])
                 attributes[i].append(attributesvalues[i])
         else:
             #if firstline. I have to add te elements to attributes
