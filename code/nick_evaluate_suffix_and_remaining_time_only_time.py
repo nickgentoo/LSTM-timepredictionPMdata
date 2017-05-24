@@ -326,7 +326,7 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
         #print(prefix_size)
     #print(len(lines),len(attributes[0]))
     for ex, (line, times, times2, times3, times4) in enumerate(izip(lines, lines_t, lines_t2, lines_t3, lines_t3)):
-        for prefix_size in range(1, len(line)):
+        for prefix_size in range(1, len(line)):#aggiunto -1 perche non voglio avere 0 nel ground truth
             #print(line,ex,len(line), len(attributes[0][ex]))
             times.append(0)
             cropped_line = ''.join(line[:prefix_size])
@@ -345,11 +345,10 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
             #y_t_seq.append(y_times[0:prefix_size])
 
             #cropped_attributes= [a[:prefix_size] for a in attributes]
-            #print cropped_attributes
-
-
+            #print cropped_attribute
             ground_truth = ''.join(line[prefix_size:prefix_size+predict_size])
-            ground_truth_t = times2[prefix_size-1]
+            ground_truth_t = times2[prefix_size-1] # era -1
+            #print(prefix_size,len(times2)-1)
             case_end_time = times2[len(times2)-1]
             ground_truth_t = case_end_time-ground_truth_t
             predicted = ''

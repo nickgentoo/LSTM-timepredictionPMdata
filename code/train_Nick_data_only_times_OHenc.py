@@ -289,6 +289,7 @@ print('num features: {}'.format(num_features))
 X = np.zeros((len(sentences), maxlen, num_features), dtype=np.float32)
 y_t = np.zeros((len(sentences)), dtype=np.float32)
 
+print(len(sentences), len(y_t_seq))
 for i, sentence in enumerate(sentences):
     leftpad = maxlen-len(sentence)
     sentence_t = sentences_t[i]
@@ -312,6 +313,7 @@ for i, sentence in enumerate(sentences):
 
             #print(y_t_seq[i])
     y_t[i] = y_t_seq[i][-1]/divisor
+    print (i,(y_t[i]*divisor)/(3600*24))
 
     np.set_printoptions(threshold=np.nan)
 
