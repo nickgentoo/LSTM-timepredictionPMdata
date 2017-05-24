@@ -33,7 +33,13 @@ from math import log
 import sys, os
 if len(sys.argv)<2:
     sys.exit("python train.py eventlog n_neurons n_layers")
-    
+
+
+def onehotencoding(N,n):
+    a = np.zeros(N)
+    np.put(a, n, 1)
+    return a
+
 #eventlog = "helpdesk.csv"  
 eventlog = sys.argv[1]      
 n_neurons=int(sys.argv[2])
@@ -301,11 +307,8 @@ for i, sentence in enumerate(sentences):
         X[i, t+leftpad, len(chars)+2] = sentence_t2[t]/divisor2
         X[i, t+leftpad, len(chars)+3] = sentence_t3[t]/86400
         X[i, t+leftpad, len(chars)+4] = sentence_t4[t]/7
-        index=0
-
         for j in xrange(len(attributes)):
-                X[i, t + leftpad, len(chars) + 5+index]=sentences_attributes[j][i][t]
-                index += 1
+                X[i, t + leftpad, len(chars) + 5+j]=sentences_attributes[j][i][t]
 
             #print(y_t_seq[i])
     y_t[i] = y_t_seq[i][-1]/divisor

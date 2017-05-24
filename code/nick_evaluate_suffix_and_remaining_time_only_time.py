@@ -58,46 +58,49 @@ next(spamreader, None)  # skip the headers
 ascii_offset = 161
 y = []
 for row in spamreader:
-    # print(row)
+    #print(row)
     t = time.strptime(row[2], "%Y-%m-%d %H:%M:%S")
-    # test different format
-    # t = 0#time.strptime(row[2], "%Y/%m/%d %H:%M:%S")
+    #test different format
+    #t = 0#time.strptime(row[2], "%Y/%m/%d %H:%M:%S")
 
-    if row[0] != lastcase:
+    if row[0]!=lastcase:
         casestarttime = t
         lasteventtime = t
         lastcase = row[0]
         if not firstLine:
+            #print (line)
             lines.append(line)
             timeseqs.append(times)
             timeseqs2.append(times2)
-            # target
-            y_times.extend([times2[-1] - k for k in times2])
+            #target
+            y_times.extend([times2[-1]-k for k in times2])
             timeseqs3.append(times3)
             timeseqs4.append(times4)
             for i in xrange(len(attributes)):
+                #print(attributesvalues[i])
                 attributes[i].append(attributesvalues[i])
         else:
-            # if firstline. I have to add te elements to attributes
+            #if firstline. I have to add te elements to attributes
             for a in row[3:]:
                 attributes.append([])
                 attributes_dict.append({})
                 attributes_sizes.append(0)
-        # print(attributes)
-        n_events_in_trace = 0
+        #print(attributes)
+        n_events_in_trace=0
         line = ''
         times = []
         times2 = []
         times3 = []
         times4 = []
+        attributesvalues = [ ]
 
-        numlines += 1
-    n_events_in_trace += 1
-    line += unichr(int(row[1]) + ascii_offset)
-    timesincelastevent = datetime.fromtimestamp(time.mktime(t)) - datetime.fromtimestamp(time.mktime(lasteventtime))
-    timesincecasestart = datetime.fromtimestamp(time.mktime(t)) - datetime.fromtimestamp(time.mktime(casestarttime))
+        numlines+=1
+    n_events_in_trace+=1
+    line+=unichr(int(row[1])+ascii_offset)
+    timesincelastevent = datetime.fromtimestamp(time.mktime(t))-datetime.fromtimestamp(time.mktime(lasteventtime))
+    timesincecasestart = datetime.fromtimestamp(time.mktime(t))-datetime.fromtimestamp(time.mktime(casestarttime))
     midnight = datetime.fromtimestamp(time.mktime(t)).replace(hour=0, minute=0, second=0, microsecond=0)
-    timesincemidnight = datetime.fromtimestamp(time.mktime(t)) - midnight
+    timesincemidnight = datetime.fromtimestamp(time.mktime(t))-midnight
     timediff = 86400 * timesincelastevent.days + timesincelastevent.seconds
     timediff2 = 86400 * timesincecasestart.days + timesincecasestart.seconds
     timediff3 = timesincemidnight.seconds
@@ -108,18 +111,36 @@ for row in spamreader:
     times4.append(timediff4)
     lasteventtime = t
     firstLine = False
-    attributesvalues = []
-    indexnick = 0
+    indexnick=0
     for a in row[3:]:
-        # todo cast a intero se e intero if
-        if a in attributes_dict[indexnick]:
-            attributesvalues.append(attributes_dict[indexnick][a])
-        else:
-            attributes_dict[indexnick][a] = attributes_sizes[indexnick]
-            attributes_sizes[indexnick] += 1
-            attributesvalues.append(attributes_dict[indexnick][a])
+        if len(attributesvalues)<=indexnick:
+            attributesvalues.append([])
+        a=a.strip('"')
+        #todo cast a intero se e intero if
+        if a!="":
+            try:
 
-        indexnick += 1
+                attr=float(a)
+                attributesvalues[indexnick].append(attr)
+                #print("float attr")
+                #print(a)
+
+            except:
+                if a not in attributes_dict[indexnick]:
+                         attributes_dict[indexnick][a]=attributes_sizes[indexnick]+1
+                         attributes_sizes[indexnick]=attributes_sizes[indexnick]+1
+
+                attributesvalues[indexnick].append(attributes_dict[indexnick][a])
+        else:
+            attributesvalues[indexnick].append(-1)
+        # if a in attributes_dict[indexnick]:
+        #     attributesvalues.append(attributes_dict[indexnick][a])
+        # else:
+        #     attributes_dict[indexnick][a]=attributes_sizes[indexnick]
+        #     attributes_sizes[indexnick]+=1
+        #     attributesvalues.append(attributes_dict[indexnick][a])
+
+        indexnick+=1
 
 # add last case
 lines.append(line)
@@ -130,7 +151,7 @@ timeseqs4.append(times4)
 y_times.extend([times2[-1] - k for k in times2])
 for i in xrange(len(attributes)):
     attributes[i].append(attributesvalues[i])
-numlines += 1
+numlines+=1
 
 divisor = np.mean([item for sublist in timeseqs for item in sublist])
 print('divisor: {}'.format(divisor))
@@ -156,7 +177,7 @@ char_indices = dict((c, i) for i, c in enumerate(chars))
 indices_char = dict((i, c) for i, c in enumerate(chars))
 target_char_indices = dict((c, i) for i, c in enumerate(target_chars))
 target_indices_char = dict((i, c) for i, c in enumerate(target_chars))
-print(indices_char)
+#print(indices_char)
 
 elems_per_fold = int(round(numlines / 3))
 fold1 = lines[:elems_per_fold]
@@ -203,7 +224,7 @@ lines_t = fold3_t
 lines_t2 = fold3_t2
 lines_t3 = fold3_t3
 lines_t4 = fold3_t4
-
+attributes=fold3_a
 # set parameters
 predict_size = maxlen
 
@@ -222,13 +243,15 @@ y_t_seq=[]
 # load model, set this to the model generated by train.py
 #model = load_model('output_files/models/200_model_59-1.50.h5')
 # define helper functions
-def encode(sentence, times,times2, times3,times4, sentences_attributes,maxlen=maxlen):
+def encode(ex, sentence, times,times2, times3,times4, sentences_attributes,maxlen=maxlen):
     num_features = len(chars)+5+len(sentences_attributes)
+    #print(num_features)
     X = np.zeros((1, maxlen, num_features), dtype=np.float32)
     leftpad = maxlen-len(sentence)
     times2 = np.cumsum(times)
     #print "sentence",len(sentence)
     for t, char in enumerate(sentence):
+        #print(t)
         #midnight = times3[t].replace(hour=0, minute=0, second=0, microsecond=0)
         #timesincemidnight = times3[t]-midnight
         multiset_abstraction = Counter(sentence[:t+1])
@@ -244,7 +267,7 @@ def encode(sentence, times,times2, times3,times4, sentences_attributes,maxlen=ma
             #print(str(i)+" "+str(t))
             #print(sentences_attributes[i][t])
             #nick check the zero, it is there because it was a list
-            X[0, t + leftpad, len(chars) + 5+i]=sentences_attributes[i][t]
+            X[0, t + leftpad, len(chars) + 5 + i] = sentences_attributes[i][t]
     return X
 # # define helper functions
 # def encode(sentence, times, times3, sentences_attributes,maxlen=maxlen):
@@ -301,8 +324,10 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
     #considering also size 1 prefixes
     #for prefix_size in range(1,maxlen):
         #print(prefix_size)
-    for line, times, times2, times3, times4 in izip(lines, lines_t, lines_t2, lines_t3, lines_t3):
+    #print(len(lines),len(attributes[0]))
+    for ex, (line, times, times2, times3, times4) in enumerate(izip(lines, lines_t, lines_t2, lines_t3, lines_t3)):
         for prefix_size in range(1, len(line)):
+            #print(line,ex,len(line), len(attributes[0][ex]))
             times.append(0)
             cropped_line = ''.join(line[:prefix_size])
             cropped_times = times[:prefix_size]
@@ -312,10 +337,12 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
 
             cropped_times3 = times3[:prefix_size]
             cropped_attributes = [[] for i in xrange(len(attributes))]
-            for a in xrange(len(attributes)):
-                # print(attributes[a][0:i])
-                cropped_attributes[a].extend(attributes[a][0:prefix_size])
-            y_t_seq.append(y_times[0:i])
+            for j in xrange(len(attributes)):
+                #print(attributes[j][ex])
+                cropped_attributes[j].extend(attributes[j][ex][0:prefix_size])
+            #print cropped_attributes
+
+            #y_t_seq.append(y_times[0:prefix_size])
 
             #cropped_attributes= [a[:prefix_size] for a in attributes]
             #print cropped_attributes
@@ -329,7 +356,7 @@ with open('output_files/results/'+fileprefix+'_suffix_and_remaining_time_%s' % e
             total_predicted_time = 0
 
             #perform single prediction
-            enc = encode(cropped_line, cropped_times,cropped_times2, cropped_times3,cropped_times4, cropped_attributes)
+            enc = encode(ex,cropped_line, cropped_times,cropped_times2, cropped_times3,cropped_times4, cropped_attributes)
             y = model.predict(enc, verbose=0) # make predictions
             # split predictions into seperate activity and time predictions
             #print y
