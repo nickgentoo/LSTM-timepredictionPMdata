@@ -348,7 +348,7 @@ for layer in range(0,len(architecture)-1):
 l_hidden_1.append(LSTM(architecture[-1], consume_less='gpu', init='glorot_uniform', return_sequences=False, dropout_W=0.2)(l_hidden_bn_1[-1])) # the layer specialized in activity prediction
 l_hidden_bn_1.append(BatchNormalization()(l_hidden_1[-1]))
 
-time_output = Dense(1,activation="tanh",init='glorot_uniform', name='time_output')(l_hidden_bn_1[-1])
+time_output = Dense(1,init='glorot_uniform', name='time_output')(l_hidden_bn_1[-1])
 
 model = Model(input=[main_input], output=[time_output])
 model.summary()
